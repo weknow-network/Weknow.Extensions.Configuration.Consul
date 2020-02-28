@@ -2,7 +2,6 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <RootNamespace>Expression_Tests</RootNamespace>
     <LangVersion>8.0</LangVersion>
     <Nullable>enable</Nullable>
     <IsPackable>true</IsPackable>
@@ -15,7 +14,7 @@
     <RepositoryUrl>https://github.com/weknow-network/Weknow.Extensions.Configuration.Consul</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>Consul, Configuration, Setting, HashiCorp, ASP.NET, Micro-Service</PackageTags>
-    <PackageReleaseNotes>Distr Goals
+    <PackageReleaseNotes>Goals
 The Goals of this implementation are:
 
 Provide easy registration of Consul as .NET Configuration.
@@ -59,5 +58,14 @@ Credits (Projects &amp; article which inspire / help in building this library):
 - USING CONSUL FOR STORING THE CONFIGURATION IN ASP.NET CORE: https://www.natmarchand.fr/consul-configuration-aspnet-core/
 </Description>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Consul" Version="0.7.2.6" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="3.1.2" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="3.1.2" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.1.2" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.2" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="3.1.2" />
+  </ItemGroup>
 
 </Project>
