@@ -3,12 +3,16 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29806.167
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Weknow.Extensions.Configuration.Consul", "Weknow.Extensions.Configuration.Consul\Weknow.Extensions.Configuration.Consul.csproj", "{264B9C1D-7BD1-4CA7-874D-564BFA708EFC}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{C9559739-DA2D-4F5F-944F-BF2D5E1F14A8}"
 	ProjectSection(SolutionItems) = preProject
 		ReadMe.md = ReadMe.md
 	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Weknow.Extensions.Configuration.Consul.WebTest", "Weknow.Extensions.Configuration.Consul.WebTest\Weknow.Extensions.Configuration.Consul.WebTest.csproj", "{105D084E-20AA-4880-9489-3A2BDBB6415A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Weknow.Extensions.Configuration.Consul.WebTest.UnitTests", "Weknow.Extensions.Configuration.Consul.WebTest.UnitTests\Weknow.Extensions.Configuration.Consul.WebTest.UnitTests.csproj", "{22E79853-CC5C-4741-B462-7AD9A0C28E92}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Weknow.Extensions.Configuration.Consul", "Weknow.Extensions.Configuration.Consul\Weknow.Extensions.Configuration.Consul.csproj", "{F0DC33AF-48C5-48A9-9D84-EED9C8A6C230}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -16,10 +20,18 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{264B9C1D-7BD1-4CA7-874D-564BFA708EFC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{264B9C1D-7BD1-4CA7-874D-564BFA708EFC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{264B9C1D-7BD1-4CA7-874D-564BFA708EFC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{264B9C1D-7BD1-4CA7-874D-564BFA708EFC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{105D084E-20AA-4880-9489-3A2BDBB6415A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{105D084E-20AA-4880-9489-3A2BDBB6415A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{105D084E-20AA-4880-9489-3A2BDBB6415A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{105D084E-20AA-4880-9489-3A2BDBB6415A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{22E79853-CC5C-4741-B462-7AD9A0C28E92}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{22E79853-CC5C-4741-B462-7AD9A0C28E92}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{22E79853-CC5C-4741-B462-7AD9A0C28E92}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{22E79853-CC5C-4741-B462-7AD9A0C28E92}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F0DC33AF-48C5-48A9-9D84-EED9C8A6C230}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F0DC33AF-48C5-48A9-9D84-EED9C8A6C230}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F0DC33AF-48C5-48A9-9D84-EED9C8A6C230}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F0DC33AF-48C5-48A9-9D84-EED9C8A6C230}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

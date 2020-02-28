@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Weknow.Extensions.Configuration.Consul
 {
-    public class Program
+    public static class Program
     {
         public static void Main(string[] args)
         {
