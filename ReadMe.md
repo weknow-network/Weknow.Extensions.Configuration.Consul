@@ -21,3 +21,11 @@ The Goals are:
   * **Namespace** \[Optional]: enable to mutate the configuration on each level of a namespace.
   * **Component** \[Optional]: enable to mutate the configuration for specific consumer class.
 * **Auto reload** configuration when configuration has changed (the reload cycle will be configurable).
+
+
+**Credits** (Projects & article which inspire / help in building this library):
+HashiCorp Consul: backbone of the configuration, provide the actual configuration management.
+Winton.Extensions.Configuration.Consul: quite similar project, this library use some parts of it.
+The confusion of ASP.NET Configuration with environment variables: https://medium.com/@gparlakov/the-confusion-of-asp-net-configuration-with-environment-variables-c06c545ef732.
+Dynamic ASP.NET Core Configurations With Consul KV: https://www.c-sharpcorner.com/article/dynamic-asp-net-core-configurations-with-consul-kv/
+USING CONSUL FOR STORING THE CONFIGURATION IN ASP.NET CORE: https://www.natmarchand.fr/consul-configuration-aspnet-core/
