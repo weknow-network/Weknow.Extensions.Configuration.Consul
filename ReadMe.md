@@ -24,8 +24,8 @@ The Goals are:
 
 
 **Credits** (Projects & article which inspire / help in building this library):
-[HashiCorp's Consul](https://www.consul.io/): backbone of the configuration, provide the actual configuration management.  
-[Winton.Extensions.Configuration.Consul](https://github.com/wintoncode/Winton.Extensions.Configuration.Consul): quite similar project, this library use some parts of it.  
-[The confusion of ASP.NET Configuration with environment variables](https://medium.com/@gparlakov/the-confusion-of-asp-net-configuration-with-environment-variables-c06c545ef732)  
-[Dynamic ASP.NET Core Configurations With Consul KV](https://www.c-sharpcorner.com/article/dynamic-asp-net-core-configurations-with-consul-kv/)  
-[USING CONSUL FOR STORING THE CONFIGURATION IN ASP.NET CORE](https://www.natmarchand.fr/consul-configuration-aspnet-core/)  
+* [HashiCorp's Consul](https://www.consul.io/): backbone of the configuration, provide the actual configuration management.  
+* [Winton.Extensions.Configuration.Consul](https://github.com/wintoncode/Winton.Extensions.Configuration.Consul): quite similar project, this library use some parts of it.  
+* [The confusion of ASP.NET Configuration with environment variables](https://medium.com/@gparlakov/the-confusion-of-asp-net-configuration-with-environment-variables-c06c545ef732)  
+* [Dynamic ASP.NET Core Configurations With Consul KV](https://www.c-sharpcorner.com/article/dynamic-asp-net-core-configurations-with-consul-kv/)  
+* [USING CONSUL FOR STORING THE CONFIGURATION IN ASP.NET CORE](https://www.natmarchand.fr/consul-configuration-aspnet-core/)  
