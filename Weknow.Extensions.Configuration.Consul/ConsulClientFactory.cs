@@ -6,7 +6,11 @@ using System.Text;
 
 namespace Weknow.Extensions.Configuration.Consul
 {
-    internal class ConsulClientFactory: IConsulProxy
+    /// <summary>
+    /// Consul client factory
+    /// </summary>
+    /// <seealso cref="Weknow.Extensions.Configuration.Consul.IConsulFactory" />
+    internal sealed class ConsulClientFactory: IConsulFactory
     {
         private readonly IConsulClientOptions _options;
 
@@ -30,7 +34,7 @@ namespace Weknow.Extensions.Configuration.Consul
         /// Creates Consul client.
         /// </summary>
         /// <returns></returns>
-        IConsulClient IConsulProxy.Create()
+        IConsulClient IConsulFactory.Create()
         {
             var client = new ConsulClient(
                 (ConsulClientConfiguration consulConfig) =>

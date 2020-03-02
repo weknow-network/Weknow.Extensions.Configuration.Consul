@@ -1,6 +1,3 @@
-// Copyright (c) Winton. All rights reserved.
-// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -15,6 +12,9 @@ using Weknow.Extensions.Configuration.Consul;
 
 namespace Microsoft.Extensions.Hosting
 {
+    /// <summary>
+    /// Consul Configuration Extensions
+    /// </summary>
     public static class ConsulConfigurationExtensions
     {
         /// <summary>
@@ -35,42 +35,45 @@ namespace Microsoft.Extensions.Hosting
         /// <returns></returns>
         public static IHostBuilder AddConsulConfiguration(
             this IHostBuilder hostBuilder,
-            Func<IConsulHierarchyBuilder, IConsulHierarchy> hierarchyConventionSetting,
+            Func<IConsulHierarchyBuilder, IConsulHierarchy>? hierarchyConventionSetting = null,
             string? address = null,
             Action<ConsulClientConfiguration>? configOverride = null,
             Action<HttpClient>? httpClientOverride = null,
             Action<HttpClientHandler>? httpClientHandlerOverride = null)
         {
-            #region IConsulHierarchy hierarchyConvention = ...
-
-            var hierarchyBuilder = ConsulHierarchyBuilder.Default;
-            IConsulHierarchy hierarchyConvention =
-                hierarchyConventionSetting?.Invoke(hierarchyBuilder) ??
-                hierarchyBuilder.ByAppName()
-                                .ByEnvironment()
-                                .ByComponent()
-
-                                .Build();
-            #endregion // IConsulHierarchy hierarchyConvention = ...
-            
             var options = new ConsulClientOptions(address, configOverride, httpClientOverride, httpClientHandlerOverride);
-            IConsulProxy factory = new ConsulClientFactory(options);
+            IConsulFactory factory = new ConsulClientFactory(options);
             hostBuilder.ConfigureServices((hostContext, services) =>
             {
                 services.AddSingleton(factory);
             });
 
-            hostBuilder = hostBuilder.ConfigureAppConfiguration(
+            hostBuilder.ConfigureAppConfiguration(
                      (host, builder) =>
                      {
                          // string consoleUrl = host.Configuration["Consul:Host"];
-                         var env = host.HostingEnvironment;
+                         IHostEnvironment env = host.HostingEnvironment;
+
+                         #region IConsulHierarchy hierarchyConvention = ...
+
+
+                         IConsulHierarchyBuilder hierarchyBuilder = new HierarchyBuilder(env);
+                         IConsulHierarchy hierarchyConvention =
+                             hierarchyConventionSetting?.Invoke(hierarchyBuilder) ??
+                             hierarchyBuilder.EntryPath("bnaya")
+                                            .ByAppName()
+                                             .ByEnvironment()
+                                             //.ByComponent()
+                                             .Build();
+
+                         #endregion // IConsulHierarchy hierarchyConvention = ...
+
                          builder.SetBasePath(env.ContentRootPath);
 
                          var configSource = new ConsulConfigurationSource(hierarchyConvention, factory);
                          builder.Add(configSource);
 
-                         builder.AddEnvironmentVariables();
+                         // builder.AddEnvironmentVariables();
                      });
             return hostBuilder;
         }

@@ -21,4 +21,9 @@
     <PackageReference Include="coverlet.collector" Version="1.0.1" />
   </ItemGroup>
 
+
+  <ItemGroup>
+    <ProjectReference Include="..\Weknow.Extensions.Configuration.Consul\Weknow.Extensions.Configuration.Consul.csproj" />
+  </ItemGroup>
+
 </Project>

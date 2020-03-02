@@ -19,7 +19,7 @@ namespace Weknow.Extensions.Configuration.Consul
     internal sealed class ConsulConfigurationSource : IConfigurationSource
     {
         private readonly IConsulHierarchy _hierarchic;
-        private readonly IConsulProxy _factory;
+        private readonly IConsulProxy _proxy;
 
         #region Ctor
 
@@ -30,20 +30,29 @@ namespace Weknow.Extensions.Configuration.Consul
         /// <param name="factory">The factory.</param>
         public ConsulConfigurationSource(
             IConsulHierarchy hierarchic,
-            IConsulProxy factory)
+            IConsulFactory factory)
         {
             _hierarchic = hierarchic;
-            _factory = factory;
+            _proxy = new ConsulProxy(factory);
         }
 
         #endregion // Ctor
 
+        #region Build
+
+        /// <summary>
+        /// Builds the <see cref="T:Microsoft.Extensions.Configuration.IConfigurationProvider" /> for this source.
+        /// </summary>
+        /// <param name="builder">The <see cref="T:Microsoft.Extensions.Configuration.IConfigurationBuilder" />.</param>
+        /// <returns>
+        /// An <see cref="T:Microsoft.Extensions.Configuration.IConfigurationProvider" />
+        /// </returns>
         IConfigurationProvider IConfigurationSource.Build(
                         IConfigurationBuilder builder)
         {
-            return new ConsulConfigurationProvider(this, consulClientFactory);
-
-            var provider = new ConsulConfigurationProvider();
+            return new ConsulConfigurationProvider(_hierarchic, _proxy);
         }
+
+        #endregion // Build
     }
 }

@@ -4,5 +4,9 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Weknow.Extensions.Configuration.Consul\Weknow.Extensions.Configuration.Consul.csproj" />
+  </ItemGroup>
+
 
 </Project>

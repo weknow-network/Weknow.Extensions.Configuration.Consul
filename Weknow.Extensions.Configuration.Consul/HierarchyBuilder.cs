@@ -1,8 +1,10 @@
-﻿using System;
+﻿using Microsoft.Extensions.Hosting;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Text;
 using Weknow.Extensions.Configuration.Consul.Permutations;
+using static Weknow.Extensions.Configuration.Consul.HierarchicConsts;
 
 namespace Weknow.Extensions.Configuration.Consul
 {
@@ -10,42 +12,62 @@ namespace Weknow.Extensions.Configuration.Consul
     /// Configuration convention builder, 
     /// used for setting the configuration hierarchy convention.
     /// </summary>
-    public class ConsulHierarchyBuilder : 
+    internal class HierarchyBuilder :
         IConsulHierarchy,
         IPermutations
     {
-        private const string ENV_KEY = "~ENV~";
-        private const string APP_KEY = "~APP~";
-        private const string NS_KEY = "~NS~";
-        private const string COMP_KEY = "~COMP~";
-
-        /// <summary>
-        /// The builder's entry point. 
-        /// </summary>
-        public static readonly IConsulHierarchyBuilder Default = new ConsulHierarchyBuilder();
-
         #region Ctor
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ConsulHierarchyBuilder"/> class.
+        /// Initializes a new instance of the <see cref="HierarchyBuilder" /> class.
         /// </summary>
-        private ConsulHierarchyBuilder()
+        /// <param name="hostEnvironment">The host environment.</param>
+        public HierarchyBuilder(
+            IHostEnvironment hostEnvironment)
         {
+            _deploymentEnvironment = hostEnvironment.EnvironmentName;
+            _applicationName = hostEnvironment.ApplicationName;
+            _hostEnvironment = hostEnvironment;
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ConsulHierarchyBuilder"/> class.
+        /// Initializes a new instance of the <see cref="HierarchyBuilder"/> class.
         /// </summary>
         /// <param name="copyFrom">The copy from.</param>
-        private ConsulHierarchyBuilder(
-            ConsulHierarchyBuilder copyFrom)
+        private HierarchyBuilder(
+            HierarchyBuilder copyFrom)
         {
             _root = copyFrom._root;
             _strictNS = copyFrom._strictNS;
             _path = copyFrom._path;
+            _applicationName = copyFrom._applicationName;
+            _deploymentEnvironment = copyFrom._deploymentEnvironment;
+            _hostEnvironment = copyFrom._hostEnvironment;
         }
 
         #endregion // Ctor
+
+        #region DeploymentEnvironment
+
+        private readonly string _deploymentEnvironment;
+        /// <summary>
+        /// Gets the deployment environment.
+        /// </summary>
+        string IConsulHierarchy.DeploymentEnvironment => _deploymentEnvironment;
+
+        #endregion // DeploymentEnvironment
+
+        #region ApplicationName
+
+        private readonly string _applicationName;
+        private readonly IHostEnvironment _hostEnvironment;
+
+        /// <summary>
+        /// Gets the name of the application.
+        /// </summary>
+        string IConsulHierarchy.ApplicationName => _applicationName;
+
+        #endregion // ApplicationName
 
         #region StrictNamespace
 
@@ -74,6 +96,7 @@ namespace Weknow.Extensions.Configuration.Consul
         #region Path
 
         private IImmutableQueue<string> _path = ImmutableQueue<string>.Empty;
+
         /// <summary>
         /// Convention Path.
         /// </summary>
@@ -108,11 +131,29 @@ namespace Weknow.Extensions.Configuration.Consul
         /// for example you can use root per tenant.
         /// </param>
         /// <returns></returns>
-        IPermutationRoot IConsulHierarchyBuilder.SetRootPath(string rootPath)
+        IPermutationRoot IConsulHierarchyBuilder.EntryPath(string rootPath)
         {
-            var next = new ConsulHierarchyBuilder(this);
+            var next = new HierarchyBuilder(this);
             next._root = rootPath;
             return next;
+        }
+
+        /// <summary>
+        /// Set the root path (within Consul, Consul root should use '/' separator).
+        /// Pattern (Root can be used for):
+        /// * Tenant isolation (multi-tenant).
+        /// * Environments (Prod, Dev, Staging)
+        /// * Separate department within a company.
+        /// </summary>
+        /// <param name="rootPathFactory">The root path where the configuration start.
+        /// for example you can use root per tenant.</param>
+        /// <returns></returns>
+        IPermutationRoot IConsulHierarchyBuilder.EntryPath(
+            Func<IHostEnvironment, string> rootPathFactory)
+        {
+            string path = rootPathFactory(_hostEnvironment);
+            IConsulHierarchyBuilder self = this;
+            return self.EntryPath(path);
         }
 
         #endregion // SetRootPath
@@ -123,9 +164,9 @@ namespace Weknow.Extensions.Configuration.Consul
         /// Add to path.
         /// </summary>
         /// <returns></returns>
-        private ConsulHierarchyBuilder ByAppName()
+        private HierarchyBuilder ByAppName()
         {
-            var next = new ConsulHierarchyBuilder(this);
+            var next = new HierarchyBuilder(this);
             next._path = _path.Enqueue(APP_KEY);
             return next;
         }
@@ -181,9 +222,9 @@ namespace Weknow.Extensions.Configuration.Consul
         /// Add to path.
         /// </summary>
         /// <returns></returns>
-        private ConsulHierarchyBuilder ByComponent()
+        private HierarchyBuilder ByComponent()
         {
-            var next = new ConsulHierarchyBuilder(this);
+            var next = new HierarchyBuilder(this);
             next._path = _path.Enqueue(COMP_KEY);
             return next;
         }
@@ -238,9 +279,9 @@ namespace Weknow.Extensions.Configuration.Consul
         /// Add to path.
         /// </summary>
         /// <returns></returns>
-        private ConsulHierarchyBuilder ByEnvironment()
+        private HierarchyBuilder ByEnvironment()
         {
-            var next = new ConsulHierarchyBuilder(this);
+            var next = new HierarchyBuilder(this);
             next._path = _path.Enqueue(ENV_KEY);
             return next;
         }
@@ -296,9 +337,9 @@ namespace Weknow.Extensions.Configuration.Consul
         /// Add to path.
         /// </summary>
         /// <returns></returns>
-        private ConsulHierarchyBuilder ByNamespace(bool strict)
+        private HierarchyBuilder ByNamespace(bool strict)
         {
-            var next = new ConsulHierarchyBuilder(this);
+            var next = new HierarchyBuilder(this);
             next._path = _path.Enqueue(NS_KEY);
             next._strictNS = strict;
             return next;
@@ -392,9 +433,9 @@ namespace Weknow.Extensions.Configuration.Consul
         /// Add to path.
         /// </summary>
         /// <returns></returns>
-        private ConsulHierarchyBuilder ByCustomEnvironmentVariable(string environmentVariable)
+        private HierarchyBuilder ByCustomEnvironmentVariable(string environmentVariable)
         {
-            var next = new ConsulHierarchyBuilder(this);
+            var next = new HierarchyBuilder(this);
             next._path = _path.Enqueue(environmentVariable);
             return next;
         }

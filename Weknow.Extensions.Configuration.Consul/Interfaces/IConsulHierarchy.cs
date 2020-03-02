@@ -9,6 +9,16 @@ namespace Weknow.Extensions.Configuration.Consul
     public interface IConsulHierarchy
     {
         /// <summary>
+        /// Gets the deployment environment.
+        /// </summary>
+        string DeploymentEnvironment { get; }
+
+        /// <summary>
+        /// Gets the name of the application.
+        /// </summary>
+        string ApplicationName { get; }
+
+        /// <summary>
         /// Get the root path (within Consul, Consul root should use '/' separator).
         /// Pattern (Root can be used for): 
         /// * Tenant isolation (multi-tenant).

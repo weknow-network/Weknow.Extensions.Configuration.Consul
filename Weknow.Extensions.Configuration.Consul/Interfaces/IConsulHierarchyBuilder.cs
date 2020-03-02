@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.Hosting;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Text;
@@ -13,7 +14,7 @@ namespace Weknow.Extensions.Configuration.Consul
     public interface IConsulHierarchyBuilder :
                         IPermutationRoot
     {
-        #region SetRootPath
+        #region EntryPath
 
         /// <summary>
         /// Set the root path (within Consul, Consul root should use '/' separator).
@@ -27,8 +28,20 @@ namespace Weknow.Extensions.Configuration.Consul
         /// for example you can use root per tenant.
         /// </param>
         /// <returns></returns>
-        IPermutationRoot SetRootPath(string rootPath);
+        IPermutationRoot EntryPath(string rootPath);
 
-        #endregion // SetRootPath
+        /// <summary>
+        /// Set the root path (within Consul, Consul root should use '/' separator).
+        /// Pattern (Root can be used for):
+        /// * Tenant isolation (multi-tenant).
+        /// * Environments (Prod, Dev, Staging)
+        /// * Separate department within a company.
+        /// </summary>
+        /// <param name="rootPathFactory">The root path where the configuration start.
+        /// for example you can use root per tenant.</param>
+        /// <returns></returns>
+        IPermutationRoot EntryPath(Func<IHostEnvironment, string> rootPathFactory);
+
+        #endregion // EntryPath
     }
 }
