@@ -16,6 +16,8 @@ using static Weknow.Extensions.Configuration.Consul.HierarchicConsts;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.Primitives;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Weknow.Extensions.Configuration.Consul
 {
@@ -123,7 +125,12 @@ namespace Weknow.Extensions.Configuration.Consul
         /// </returns>
         bool IConfigurationProvider.TryGet(string key, out string value)
         {
-            value = _data.GetAddMergedValue(key);
+            var args = key.Split(":");
+            value = _data.GetAddMergedValue(args[0]);
+            if (value != string.Empty && args.Length > 1)
+            {
+                value = JObject.Parse(value)[args[1]].ToString();
+            }
 
             return value != string.Empty;
         }
