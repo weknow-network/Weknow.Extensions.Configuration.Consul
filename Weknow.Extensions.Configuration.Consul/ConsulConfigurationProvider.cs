@@ -28,7 +28,6 @@ namespace Weknow.Extensions.Configuration.Consul
 
         private readonly IConsulHierarchy _hierarchic;
         private readonly IConsulProxy _proxy;
-        private TaskCompletionSource<object?> _initializing = new TaskCompletionSource<object?>();
 
         #region Ctor
 
@@ -86,29 +85,19 @@ namespace Weknow.Extensions.Configuration.Consul
         /// <returns></returns>
         private async Task LoadAsync()
         {
-            _cancellationTokenSource.Token.ThrowIfCancellationRequested();
-            try
-            {
-                var lockScope = await _gate.TryAcquireAsync();
-                if (!lockScope.Acquired)
-                    return;
+            var lockScope = await _gate.TryAcquireAsync();
+            if (!lockScope.Acquired)
+                return;
 
-                string root = _hierarchic.Root;
-                KVPair[] results = await _proxy.GetDataAsync(root, _cancellationTokenSource.Token);
-                foreach (KVPair pair in results)
-                {
-                    string key = pair.Key.ToLower();
-                    byte[] value = pair.Value;
-                    if (!string.IsNullOrEmpty(root))
-                        key = key.Substring(root.Length + 1);
-                    _data.AddOrUpdate(key, value);
-                }
-
-                _initializing.TrySetResult(null);
-            }
-            catch (Exception ex)
+            string root = _hierarchic.Root;
+            KVPair[] results = await _proxy.GetDataAsync(root, _cancellationTokenSource.Token);
+            foreach (KVPair pair in results)
             {
-                _initializing.TrySetException(ex);
+                string key = pair.Key.ToLower();
+                byte[] value = pair.Value;
+                if (!string.IsNullOrEmpty(root))
+                    key = key.Substring(root.Length + 1);
+                _data.AddOrUpdate(key, value);
             }
         }
 
@@ -126,16 +115,6 @@ namespace Weknow.Extensions.Configuration.Consul
         /// </returns>
         public override bool TryGet(string key, out string value)
         {
-            #region _initializing.Task.Wait(...)
-
-            var token = CancellationTokenSource.CreateLinkedTokenSource(
-                        _cancellationTokenSource.Token,
-                        new CancellationTokenSource(LOCK_TIMEOT).Token
-                    );
-            _initializing.Task.Wait(token.Token);
-
-            #endregion // _initializing.Task.Wait(...)
-
             value = _data.GetAddMergedValue(key);
 
             return value != string.Empty;
