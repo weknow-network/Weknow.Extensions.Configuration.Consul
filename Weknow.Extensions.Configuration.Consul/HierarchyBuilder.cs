@@ -12,7 +12,7 @@ namespace Weknow.Extensions.Configuration.Consul
     /// Configuration convention builder, 
     /// used for setting the configuration hierarchy convention.
     /// </summary>
-    internal class HierarchyBuilder :
+    public class HierarchyBuilder :
         IConsulHierarchy,
         IPermutations
     {
@@ -117,7 +117,7 @@ namespace Weknow.Extensions.Configuration.Consul
 
         #endregion // Build
 
-        #region SetRootPath
+        #region EntryPath
 
         /// <summary>
         /// Set the root path (within Consul, Consul root should use '/' separator).
@@ -156,7 +156,7 @@ namespace Weknow.Extensions.Configuration.Consul
             return self.EntryPath(path);
         }
 
-        #endregion // SetRootPath
+        #endregion // EntryPath
 
         #region ByAppName
 

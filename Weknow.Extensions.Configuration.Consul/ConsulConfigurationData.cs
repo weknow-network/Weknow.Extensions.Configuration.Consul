@@ -14,13 +14,15 @@ using static Weknow.Extensions.Configuration.Consul.JsonUtils;
 using static System.Text.Encoding;
 using static Weknow.Extensions.Configuration.Consul.HierarchicConsts;
 using System.Diagnostics;
+using System.Collections;
+using System.Text;
 
 namespace Weknow.Extensions.Configuration.Consul
 {
     /// <summary>
     /// Configuration data representation
     /// </summary>
-    internal sealed class ConsulConfigurationData
+    internal sealed class ConsulConfigurationData: IDictionary<string, string>
     {
         private readonly ConcurrentDictionary<string, byte[]> _rawConfiguration =
                                                 new ConcurrentDictionary<string, byte[]>();
@@ -56,6 +58,7 @@ namespace Weknow.Extensions.Configuration.Consul
             byte[] buffer = Array.Empty<byte>();
             MergeSubPath(key, ref json, ref buffer);
 
+            var path = new StringBuilder();
             foreach (var hierarchic in _hierarchic.Path)
             {
                 string h = hierarchic switch
@@ -66,8 +69,10 @@ namespace Weknow.Extensions.Configuration.Consul
                     COMP_KEY => throw new NotImplementedException(),
                     _ => throw new NotSupportedException(hierarchic)
                 };
-                key = $"{key}/{h}";
-                MergeSubPath(key, ref json, ref buffer);
+                if (path.Length != 0)
+                    path.Append("/");
+                path.Append(h);
+                MergeSubPath($"{path}/{key}", ref json, ref buffer);
             }
             return json;
         }
@@ -87,16 +92,21 @@ namespace Weknow.Extensions.Configuration.Consul
                     ref string json,
                     ref byte[] buffer)
         {
-            if (_mergedConfiguration.TryGetValue(key, out string? j))
-                json = j;
-            if (_rawConfiguration.TryGetValue(key, out byte[]? b))
+            key = key.ToLower();
+            bool isCached = _mergedConfiguration.TryGetValue(key, out string? newJson);
+            if (isCached)
+                json = newJson ?? string.Empty;
+            if (_rawConfiguration.TryGetValue(key, out byte[]? newBuffer))
             {
-                buffer = b;
-                if (json != string.Empty)
+                if (!isCached)
                 {
-                    json = UTF8.GetString(buffer);
+                    if (buffer.Length == 0)
+                        json = UTF8.GetString(newBuffer);
+                    else
+                        json = MergeAsString(buffer, newBuffer);
                     _mergedConfiguration.TryAdd(key, json);
                 }
+                buffer = newBuffer;
             }
         }
 
@@ -116,8 +126,9 @@ namespace Weknow.Extensions.Configuration.Consul
             foreach (string removalKey in _rawConfiguration.Keys
                                         .Where(k => k.StartsWith(key)))
             {
-                _rawConfiguration.TryRemove(removalKey, out byte[]? val);
+                _mergedConfiguration.TryRemove(removalKey, out string? val);
             }
+            
         }
 
         /// <summary>
@@ -161,5 +172,71 @@ namespace Weknow.Extensions.Configuration.Consul
         }
 
         #endregion // GetRaw
+
+        void IDictionary<string, string>.Add(string key, string value)
+        {
+            throw new NotImplementedException();
+        }
+
+        bool IDictionary<string, string>.ContainsKey(string key)
+        {
+            throw new NotImplementedException();
+        }
+
+        bool IDictionary<string, string>.Remove(string key)
+        {
+            throw new NotImplementedException();
+        }
+
+        bool IDictionary<string, string>.TryGetValue(string key, out string value)
+        {
+            value = string.Empty;
+            return false;
+        }
+
+        void ICollection<KeyValuePair<string, string>>.Add(KeyValuePair<string, string> item)
+        {
+            throw new NotImplementedException();
+        }
+
+        void ICollection<KeyValuePair<string, string>>.Clear()
+        {
+            throw new NotImplementedException();
+        }
+
+        bool ICollection<KeyValuePair<string, string>>.Contains(KeyValuePair<string, string> item)
+        {
+            throw new NotImplementedException();
+        }
+
+        void ICollection<KeyValuePair<string, string>>.CopyTo(KeyValuePair<string, string>[] array, int arrayIndex)
+        {
+            throw new NotImplementedException();
+        }
+
+        bool ICollection<KeyValuePair<string, string>>.Remove(KeyValuePair<string, string> item)
+        {
+            throw new NotImplementedException();
+        }
+
+        IEnumerator<KeyValuePair<string, string>> IEnumerable<KeyValuePair<string, string>>.GetEnumerator()
+        {
+            return _mergedConfiguration.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            throw new NotImplementedException();
+        }
+
+        ICollection<string> IDictionary<string, string>.Keys => throw new NotImplementedException();
+
+        ICollection<string> IDictionary<string, string>.Values => throw new NotImplementedException();
+
+        int ICollection<KeyValuePair<string, string>>.Count => throw new NotImplementedException();
+
+        bool ICollection<KeyValuePair<string, string>>.IsReadOnly => throw new NotImplementedException();
+
+        string IDictionary<string, string>.this[string key] { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
     }
 }

@@ -19,6 +19,7 @@ namespace Weknow.Extensions.Configuration.Consul
 {
     internal sealed class ConsulConfigurationProvider : ConfigurationProvider, IAsyncDisposable
     {
+        private static readonly TimeSpan LOAD_TIMEOT = TimeSpan.FromSeconds(30);
         private static readonly TimeSpan LOCK_TIMEOT = TimeSpan.FromSeconds(30);
         private readonly AsyncLock _gate = new AsyncLock(LOCK_TIMEOT);
 
@@ -71,7 +72,7 @@ namespace Weknow.Extensions.Configuration.Consul
         /// </summary>
         public override void Load()
         {
-            Task _ = LoadAsync();
+            LoadAsync().Wait(LOAD_TIMEOT);
         }
 
         #endregion // Load

@@ -60,8 +60,7 @@ namespace Microsoft.Extensions.Hosting
                          IConsulHierarchyBuilder hierarchyBuilder = new HierarchyBuilder(env);
                          IConsulHierarchy hierarchyConvention =
                              hierarchyConventionSetting?.Invoke(hierarchyBuilder) ??
-                             hierarchyBuilder.EntryPath("bnaya")
-                                            .ByAppName()
+                             hierarchyBuilder.ByAppName()
                                              .ByEnvironment()
                                              //.ByComponent()
                                              .Build();

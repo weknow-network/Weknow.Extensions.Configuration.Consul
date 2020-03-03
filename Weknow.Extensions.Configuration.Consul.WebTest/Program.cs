@@ -18,7 +18,11 @@ namespace Weknow.Extensions.Configuration.Consul
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
-                .AddConsulConfiguration()
+                .AddConsulConfiguration(builder =>
+                            builder//.EntryPath( env => $"{env.ApplicationName}/{env.EnvironmentName}")
+                                    .ByAppName()
+                                    .ByEnvironment()
+                                    .Build())
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();

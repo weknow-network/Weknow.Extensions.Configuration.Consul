@@ -14,6 +14,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Weknow.Extensions.Configura
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Weknow.Extensions.Configuration.Consul.UnitTests", "Weknow.Extensions.Configuration.Consul.UnitTests\Weknow.Extensions.Configuration.Consul.UnitTests.csproj", "{D29CECF3-35CD-483A-9403-05ABF1132786}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebTests", "WebTests\WebTests.csproj", "{E0F36FF8-0BC1-49D4-A5CF-B951BDF935EE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -32,6 +34,10 @@ Global
 		{D29CECF3-35CD-483A-9403-05ABF1132786}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D29CECF3-35CD-483A-9403-05ABF1132786}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D29CECF3-35CD-483A-9403-05ABF1132786}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E0F36FF8-0BC1-49D4-A5CF-B951BDF935EE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E0F36FF8-0BC1-49D4-A5CF-B951BDF935EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E0F36FF8-0BC1-49D4-A5CF-B951BDF935EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E0F36FF8-0BC1-49D4-A5CF-B951BDF935EE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
