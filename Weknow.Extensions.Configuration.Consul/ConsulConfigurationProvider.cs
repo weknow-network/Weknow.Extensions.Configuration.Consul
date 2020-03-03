@@ -14,11 +14,17 @@ using static Weknow.Extensions.Configuration.Consul.JsonUtils;
 using static System.Text.Encoding;
 using static Weknow.Extensions.Configuration.Consul.HierarchicConsts;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
+using Microsoft.Extensions.Primitives;
 
 namespace Weknow.Extensions.Configuration.Consul
 {
-    internal sealed class ConsulConfigurationProvider : ConfigurationProvider, IAsyncDisposable
+    internal sealed class ConsulConfigurationProvider :
+        IConfigurationProvider,
+        IAsyncDisposable
     {
+        private ConfigurationReloadToken _reloadToken = new ConfigurationReloadToken();
+
         private static readonly TimeSpan LOAD_TIMEOT = TimeSpan.FromSeconds(30);
         private static readonly TimeSpan LOCK_TIMEOT = TimeSpan.FromSeconds(30);
         private readonly AsyncLock _gate = new AsyncLock(LOCK_TIMEOT);
@@ -67,23 +73,22 @@ namespace Weknow.Extensions.Configuration.Consul
         #region Load
 
         /// <summary>
-        /// Loads (or reloads) the data for this provider.
+        /// Loads configuration values from the source represented by this <see cref="T:Microsoft.Extensions.Configuration.IConfigurationProvider" />.
         /// </summary>
-        public override void Load()
+        void IConfigurationProvider.Load()
         {
-            LoadAsync().Wait(LOAD_TIMEOT);
+            LoadAsync(true).Wait(LOAD_TIMEOT);
         }
 
         #endregion // Load
 
         #region LoadAsync
 
-
         /// <summary>
         /// Initializing or reloading.
         /// </summary>
         /// <returns></returns>
-        private async Task LoadAsync()
+        private async Task LoadAsync(bool init = false)
         {
             var lockScope = await _gate.TryAcquireAsync();
             if (!lockScope.Acquired)
@@ -91,6 +96,7 @@ namespace Weknow.Extensions.Configuration.Consul
 
             string root = _hierarchic.Root;
             KVPair[] results = await _proxy.GetDataAsync(root, _cancellationTokenSource.Token);
+            Array.Sort(results, KVPairComparer.Default);
             foreach (KVPair pair in results)
             {
                 string key = pair.Key.ToLower();
@@ -99,6 +105,8 @@ namespace Weknow.Extensions.Configuration.Consul
                     key = key.Substring(root.Length + 1);
                 _data.AddOrUpdate(key, value);
             }
+
+            OnReload();
         }
 
         #endregion // LoadAsync
@@ -113,7 +121,7 @@ namespace Weknow.Extensions.Configuration.Consul
         /// <returns>
         /// True if key has a value, false otherwise.
         /// </returns>
-        public override bool TryGet(string key, out string value)
+        bool IConfigurationProvider.TryGet(string key, out string value)
         {
             value = _data.GetAddMergedValue(key);
 
@@ -121,5 +129,87 @@ namespace Weknow.Extensions.Configuration.Consul
         }
 
         #endregion // TryGet
+
+        #region GetReloadToken
+
+        /// <summary>
+        /// Returns a change token if this provider supports change tracking, null otherwise.
+        /// </summary>
+        /// <returns>
+        /// The change token.
+        /// </returns>
+        IChangeToken IConfigurationProvider.GetReloadToken() => _reloadToken;
+
+        #endregion // GetReloadToken
+
+        #region OnReload
+
+        /// <summary>
+        /// Triggers the reload change token and creates a new one.
+        /// </summary>
+        private void OnReload()
+        {
+            var previousToken = Interlocked.Exchange(ref _reloadToken, new ConfigurationReloadToken());
+            previousToken.OnReload();
+        }
+
+        #endregion // OnReload
+
+        #region Set
+
+        /// <summary>
+        /// Sets a configuration value for the specified key.
+        /// </summary>
+        /// <param name="key">The key.</param>
+        /// <param name="value">The value.</param>
+        /// <exception cref="NotImplementedException"></exception>
+        void IConfigurationProvider.Set(string key, string value)
+        {
+            throw new NotImplementedException();
+        }
+
+        #endregion // Set
+
+        #region GetChildKeys
+
+        /// <summary>
+        /// Returns the immediate descendant configuration keys for a given parent path based on this
+        /// <see cref="T:Microsoft.Extensions.Configuration.IConfigurationProvider" />s data and the set of keys returned by all the preceding
+        /// <see cref="T:Microsoft.Extensions.Configuration.IConfigurationProvider" />s.
+        /// </summary>
+        /// <param name="earlierKeys">The child keys returned by the preceding providers for the same parent path.</param>
+        /// <param name="parentPath">The parent path.</param>
+        /// <returns>
+        /// The child keys.
+        /// </returns>
+        /// <exception cref="NotImplementedException"></exception>
+        IEnumerable<string> IConfigurationProvider.GetChildKeys(IEnumerable<string> earlierKeys, string parentPath)
+        {
+            var result = earlierKeys;
+            //var prefix = parentPath == null ? string.Empty : parentPath + ConfigurationPath.KeyDelimiter;
+
+            //var result = _data
+            //    .Where(kv => kv.Key.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+            //    .Select(kv => Segment(kv.Key, prefix.Length))
+            //    .Concat(earlierKeys)
+            //    .OrderBy(k => k, ConfigurationKeyComparer.Instance)
+            //    .ToArray();
+
+            return result;
+
+            ///// <summary>
+            ///// Segments the specified key.
+            ///// </summary>
+            ///// <param name="key">The key.</param>
+            ///// <param name="prefixLength">Length of the prefix.</param>
+            ///// <returns></returns>
+            //string Segment(string key, int prefixLength)
+            //{
+            //    var indexOf = key.IndexOf(ConfigurationPath.KeyDelimiter, prefixLength, StringComparison.OrdinalIgnoreCase);
+            //    return indexOf < 0 ? key.Substring(prefixLength) : key.Substring(prefixLength, indexOf - prefixLength);
+            //}
+        }
+
+        #endregion // GetChildKeys
     }
 }
